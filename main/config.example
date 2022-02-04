@@ -1,0 +1,5 @@
+{
+    userID:int,
+    dir:str(Download directory),
+    names:{seriesname: ep}
+}
