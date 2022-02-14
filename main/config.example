@@ -1,5 +1,10 @@
 {
-    userID:int,
-    dir:str(Download directory),
-    names:{seriesname: ep}
+    userID           :int,
+    dir              :str(Download directory),
+    preferred-bot    : "CR-HOLLAND|NEW"(Refer https://nibl.co.uk/bots)
+    resolution       :1080 or 720 or 480 or etc
+    //the following is updated when you run the program
+    //leave empty
+    names: {}
+    //names:{seriesname: ep}
 }
