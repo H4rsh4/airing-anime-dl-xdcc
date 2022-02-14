@@ -1,4 +1,4 @@
-
+#logging pending
 import requests
 import json
 import time
@@ -9,38 +9,45 @@ log.basicConfig(filename="api.log",
                 format="%(asctime)s %(message)s",
                 filemode="w",
                 encoding='utf-8')
+class Queries:
 
-query = '''
-query($userId: Int){
-  MediaListCollection(userId:$userId, type:ANIME, status: CURRENT){
-    lists{
-      name
-      status
-      entries {
+  current_watching = '''
+  query($userId: Int){
+    MediaListCollection(userId:$userId, type:ANIME, status: CURRENT){
+      lists{
+        name
         status
-        media{
-          title{
-            romaji
-          }
-          
+        entries {
           status
-          nextAiringEpisode {
-            episode
+          media{
+            title{
+              romaji
+            }
             
+            status
+            nextAiringEpisode {
+              episode
+              
+            }
           }
         }
       }
+      
     }
-    
   }
-}
-'''
+  '''
 
 base_url  = 'https://graphql.anilist.co'
 
-configRAW =  open("main/config.json", "r")
-config = json.load(configRAW)
-configRAW.close()
+config = {}
+try:
+    configRAW =  open("main/config.json", "r")
+    config = json.load(configRAW)
+    configRAW.close()
+except FileNotFoundError:
+    configRAW =  open("./config.json", "r")
+    config = json.load(configRAW)
+    configRAW.close()
 
 def write_to_config(data:dict):
   # raw = open("config.json", "r")
@@ -53,7 +60,7 @@ def write_to_config(data:dict):
   raw.write(json.dumps(config))
   raw.close()
 
-def process(raw:dict)->dict:
+def get_processed_data(raw:dict)->dict:
     raw = ((raw["data"]["MediaListCollection"]["lists"])[0])
     final = {}
     if raw['name']=="Watching" and raw['status']=='CURRENT':
@@ -71,7 +78,7 @@ def process(raw:dict)->dict:
 
     return final
 
-def getList(query:str, userID:int)-> dict:
+def get_list(query:str, userID:int,)-> dict:
     variables={
         'userId' : userID
     }
@@ -86,13 +93,14 @@ def getList(query:str, userID:int)-> dict:
             return{}
     except requests.ConnectionError:
         time.sleep(300)
-    processed = process(json.loads(res.content))
+    processed = get_processed_data(json.loads(res.content))
+    #if updateConfig: 
     write_to_config(processed)
-    #return processed
+    return processed
 
 if __name__ == '__main__':
 
-  getList(query=query, userID=config["userID"])
+  get_list(query=Queries.current_watching, userID=config["userID"], )
 
 
 

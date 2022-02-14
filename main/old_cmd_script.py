@@ -79,10 +79,10 @@ def mv():
     
 
 #search = "sono bisque 04 1080"
-# botname = "CR-HOLLAND|NEW"
-# bot = "/bot/"+ botname
-# soup = BeautifulSoup(getResultsPage(search),"html.parser")
-# pack = getPack(soup)
+botname = "CR-HOLLAND|NEW"
+bot = "/bot/"+ botname
+#soup = BeautifulSoup(getResultsPage(search),"html.parser")
+#pack = getPack(soup)
 
 parser = argparse.ArgumentParser(description="xdcc automater")
 parser.add_argument('-n', type=ascii, nargs=1,
@@ -99,8 +99,8 @@ search = f"{name} {ep} 1080"
 
 soup = BeautifulSoup(getResultsPage(search),"html.parser")
 pack = getPack(soup)
-#download(pack)
-print(pack)
+download(pack)
+#print(pack)
 
 
 
