@@ -73,7 +73,7 @@ def download(searches):
         if pack:
             if not check_file(build_dir_name(name), pack.filename):
                 logger.info(f"Downloading - {pack.filename} - {pack.packnumber}")
-                #download_packs([pack])
+                download_packs([pack])
             else:
                 logger.info(f"File Already Exists - {pack.filename} - {pack.packnumber}")
                 continue
