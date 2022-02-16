@@ -4,38 +4,12 @@ import json
 import time
 import logging as log
 import re
+from Queries import Queries
 
 log.basicConfig(filename="api.log", 
                 format="%(asctime)s %(message)s",
                 filemode="w",
                 encoding='utf-8')
-class Queries:
-
-  current_watching = '''
-  query($userId: Int){
-    MediaListCollection(userId:$userId, type:ANIME, status: CURRENT){
-      lists{
-        name
-        status
-        entries {
-          status
-          media{
-            title{
-              romaji
-            }
-            
-            status
-            nextAiringEpisode {
-              episode
-              
-            }
-          }
-        }
-      }
-      
-    }
-  }
-  '''
 
 base_url  = 'https://graphql.anilist.co'
 
@@ -49,18 +23,20 @@ except FileNotFoundError:
     config = json.load(configRAW)
     configRAW.close()
 
-def write_to_config(data:dict):
+def write_to_config(ids:list,data:dict):
   # raw = open("config.json", "r")
   # current = json.load(raw)
   # raw.close()
 
+  config['ids'] = ids
   config["names"] = data
 
   raw = open("main/config.json", "w+")
   raw.write(json.dumps(config))
   raw.close()
 
-def get_processed_data(raw:dict)->dict:
+def get_processed_data(raw:dict):
+    ids=[]
     raw = ((raw["data"]["MediaListCollection"]["lists"])[0])
     final = {}
     if raw['name']=="Watching" and raw['status']=='CURRENT':
@@ -75,8 +51,9 @@ def get_processed_data(raw:dict)->dict:
             name = name.replace("  ", " ")
             ep = i['media']['nextAiringEpisode']['episode']-1
             final[name] = ep
+            ids.append(i['media']['id'])
 
-    return final
+    return ids,final
 
 def get_list(query:str, userID:int,)-> dict:
     variables={
@@ -93,9 +70,9 @@ def get_list(query:str, userID:int,)-> dict:
             return{}
     except requests.ConnectionError:
         time.sleep(300)
-    processed = get_processed_data(json.loads(res.content))
+    ids,processed = get_processed_data(json.loads(res.content))
     #if updateConfig: 
-    write_to_config(processed)
+    write_to_config(ids,processed)
     return processed
 
 if __name__ == '__main__':

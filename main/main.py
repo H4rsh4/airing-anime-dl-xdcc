@@ -1,4 +1,5 @@
 #logging pending
+from distutils.command.build import build
 from xdcc_dl.pack_search import SearchEngines
 from xdcc_dl.xdcc import download_packs
 from xdcc_dl.entities import XDCCPack
@@ -40,11 +41,17 @@ except FileNotFoundError:
 #     except FileNotFoundError:
 #         os.mkdir(path)
 #         os.chdir(path)
+
+def build_dir_name(seriesname):
+    folder_name = seriesname.replace(" ", '.')
+    folder_name = folder_name.strip()
+    return folder_name
+
 def search()->list:
     series = config["names"].keys()
     search_results={}
-    def process(xdccOBJ:XDCCPack):
-        xdccOBJ.set_directory(config["dir"])
+    def process(xdccOBJ:XDCCPack, show):
+        xdccOBJ.set_directory(config["dir"]+build_dir_name(show)+"/S")
         return xdccOBJ
 
     for show in series:
@@ -64,18 +71,25 @@ def search()->list:
         for s in tmp_search_results:
             if s.bot == config["preferred-bot"]:
                 #s = process(s)
-                search_results[show] = process(s)
+                search_results[show] = process(s, show)
                 break
         else:
             #process(tmp_search_results[0])
-            search_results[show] = process(tmp_search_results[0])
+            search_results[show] = process(tmp_search_results[0], show)
 
     return search_results
 
-def check_file(seriesname, filename):
-    folder_name = seriesname.replace(" ", '.')
-    folder_name = folder_name.strip()
-    files = os.listdir(config["dir"]+folder_name)
+def check_file(folder_name, filename):
+    # folder_name = seriesname.replace(" ", '.')
+    # folder_name = folder_name.strip()
+    #folder_name = seriesname
+    #mkdir if not folder exists
+    files=[]
+    try:
+        files = os.listdir(config["dir"]+folder_name)
+    except FileNotFoundError:
+        os.mkdir(config["dir"]+folder_name)
+        files = os.listdir(config["dir"]+folder_name)
     #print(files)
     if len(files)>0:
         #LATEST DOWNLOADED FILE
@@ -105,7 +119,7 @@ def download(searches):
     for name,pack in searches.items():
         #checkfile(name, pack.filename)
         if pack:
-            if not check_file(name, pack.filename):
+            if not check_file(build_dir_name(name), pack.filename):
                 print("DOWNLOAD")
                 download_packs([pack])
             else:
