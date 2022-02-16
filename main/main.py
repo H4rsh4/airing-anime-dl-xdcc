@@ -10,7 +10,7 @@ log.basicConfig(filename="logs/log.log",
                 format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
                 filemode="a",
                 encoding='utf-8',
-                level=log.DEBUG)
+                level=log.INFO)
 
 try:
     configRAW =  open("main/config.json", "r")

@@ -88,7 +88,7 @@ def search()->list:
     search_results={}
 
     def change_props(xdccOBJ:XDCCPack, show):
-        xdccOBJ.set_directory(config["dir"]+build_dir_name(show)+"/S")
+        xdccOBJ.set_directory(config["dir"]+build_dir_name(show)+"/")
         return xdccOBJ
 
     for show in user_list:
