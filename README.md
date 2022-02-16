@@ -7,7 +7,7 @@
 > Downloads to the specified(config) directory
 
 This program relies on:
-    > [anilist's api](https://github.com/AniList/ApiV2-GraphQL-Docs) .
+    > [anilist's api](https://github.com/AniList/ApiV2-GraphQL-Docs)
     > [xdcc-dl](https://github.com/namboy94/xdcc-dl/)
 
 ```
