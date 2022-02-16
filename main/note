@@ -1,0 +1,10 @@
+commented out the progress bar in
+site-packages/xdcc_dl/xdcc/XDCCClient.py
+L#133,196,221
+
+use crontab for scheduling (0 12,18 */2 * *)
+
+Major Function Needed:
+    If a new episode has been aired
+        But there is no new release on nibl
+            run the script every 30mins until a release is available

@@ -1,5 +1,2 @@
-- [soon_maybe]logs: implement actually logging maybe idk
-- [next]basic scheduler: that checks for new episodes everyday
-- [future]scheduler: query anilist for nextairingdate, create a cron or whatever to invoke the script on that day
 - [future]config option: download all aired episodes if they dont exists
 - [next]download based on various lists: airing, completed, privatelists(gonna have to write diff graphql queries)
