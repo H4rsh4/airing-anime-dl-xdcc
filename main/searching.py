@@ -1,4 +1,4 @@
-import os,sys,re
+import os,sys,re,time
 import json
 import logging
 
@@ -19,23 +19,13 @@ XDCCPack:
     size
 """
 logger = logging.getLogger(__name__)
-#Read Config
-config = {}
-try:
-    configRAW =  open("config.json", "r")
-except FileNotFoundError:
-    logger.critical("FAILED to open config.json for reading")
-    sys.quit()
-
-config = json.load(configRAW)
-configRAW.close()
 
 def build_dir_name(seriesname:str) -> str:
     folder_name = seriesname.replace(" ", '.')
     folder_name = folder_name.strip()
     return folder_name
 
-def check_file(folder_name:str, filename:str) -> bool:
+def check_file(config:dict,folder_name:str, filename:str) -> bool:
     '''
     Check if the latest aired ep is alr downloaded or not
     To avoid duplicate downloads
@@ -64,21 +54,21 @@ def check_file(folder_name:str, filename:str) -> bool:
             return True
     return False
 
-def download(searches):
+def download(config,searches):
     '''
     Searches for each file in the folder; if it doesnt exist->download
     '''
     #searches = {series name : xdccpack}
     for name,pack in searches.items():
         if pack:
-            if not check_file(build_dir_name(name), pack.filename):
+            if not check_file(config, build_dir_name(name), pack.filename):
                 logger.info(f"Downloading - {pack.filename} - {pack.packnumber}")
                 download_packs([pack])
             else:
                 logger.info(f"File Already Exists - {pack.filename} - {pack.packnumber}")
                 continue
 
-def search()->list:
+def search(config:dict)->list:
     '''
     Searches for latest episode of each show
     only NIBL is searched
@@ -94,6 +84,17 @@ def search()->list:
     for show in user_list:
         ep = str(config["names"][show]).zfill(2)
         current_show_search_results = SearchEngines.NIBL.value.search(show+' '+ep+' '+str(config["resolution"]))
+        #if len(current_show_search_results)==0:
+        if not current_show_search_results:
+            while(True):
+                logger.info(f"Couldn't find latest ep of {show}\nWill Retry in 30mins")
+                time.sleep(30*60)#30mins
+                logger.info(f"ReSearching {show}")
+                current_show_search_results = SearchEngines.NIBL.value.search(show+' '+ep+' '+str(config["resolution"]))
+                if current_show_search_results: break
+            
+            
+        #else:
         for pack in current_show_search_results:
             if pack.bot == config["preferred-bot"]:
                 search_results[show] = change_props(pack, show)

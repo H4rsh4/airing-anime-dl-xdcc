@@ -11,31 +11,6 @@ logger = logging.getLogger(__name__)
 
 base_url = 'https://graphql.anilist.co'
 
-config = {}
-try:
-    configRAW = open("config.json", "r")
-except FileNotFoundError:
-    logger.critical("FAILED to open config.json for reading")
-config = json.load(configRAW)
-configRAW.close()
-
-
-def write_to_config(ids: list, data: dict)-> list[list]:
-    '''
-  self-explanatory
-  '''
-    config['ids'] = ids
-    config["names"] = data
-
-    try:
-        raw = open("config.json", "w+")
-    except FileNotFoundError:
-        logger.critical("FAILED to open config.json to write data")
-        sys.quit()
-    raw.write(json.dumps(config))
-    raw.close()
-
-
 def process_data(raw: dict):
     '''
     This function processes the raw json data from anilist api
@@ -63,7 +38,7 @@ def process_data(raw: dict):
     return ids, data
 
 
-def update_list(query: str,userID: int) -> dict:
+def update_list(config:dict, query: str,userID: int) -> dict:
     variables = {'userId': userID}
     try:
         res = requests.post(base_url,
@@ -81,13 +56,18 @@ def update_list(query: str,userID: int) -> dict:
     except requests.ConnectionError:
         time.sleep(300)
     ids, processed = process_data(json.loads(res.content))
-    # if updateConfig:
-    write_to_config(ids, processed)
-    return processed
+    config['ids'] = ids
+    config["names"] = processed
+    return config
 
 
 if __name__ == '__main__':
-
+    try:
+        configRAW = open("config.json", "r")
+    except FileNotFoundError:
+        print("FAILED to open config.json for reading")
+    config = json.load(configRAW)
+    configRAW.close()
     update_list(
         query=Queries.current_watching,
         userID=config["userID"],
