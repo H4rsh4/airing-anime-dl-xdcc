@@ -14,9 +14,10 @@ log.basicConfig(filename="logs/log.log",
                 level=log.INFO)
 
 try:
-    configRAW = open("main/config.json", "r")
-except FileNotFoundError:
     configRAW = open("config.json", "r")
+except FileNotFoundError:
+    log.critical("FAILED to open config.json to read data")
+    sys.quit()
 config = json.load(configRAW)
 configRAW.close()
 
@@ -34,8 +35,7 @@ raw.write(json.dumps(config))
 raw.close()
 
 log.info("List Update Successfull")
-
 res = search(config)
 log.info("Search Successfull")
-download(config,res)
+download(config, res)
 log.info("Scheduled Run END")
