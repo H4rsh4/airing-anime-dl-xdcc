@@ -7,3 +7,4 @@ config.json
 r.txt
 *.log
 *.sh
+main/dl_all.py

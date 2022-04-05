@@ -23,8 +23,11 @@ configRAW.close()
 
 log.info("Scheduled Run BEGIN")
 
+# config = update_list(
+#     config=config, query=Queries.current_watching, userID=config["userID"], )
 config = update_list(
-    config=config, query=Queries.current_watching, userID=config["userID"], )
+    config=config, query=Queries.current_watching_anime, userID=config["userID"], )
+
 
 try:
     raw = open("config.json", "w+")
