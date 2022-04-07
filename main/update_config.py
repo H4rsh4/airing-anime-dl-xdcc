@@ -50,7 +50,7 @@ def process_data(raw: dict):
             name = re.sub('[^a-zA-Z\s]', ' ', name)
             name = name.replace("  ", " ")
             #Filter: If anime HAS NOT finished airing, get current ep using the following
-            if i['media']["episodes"] == None:
+            if i['media']["status"] == "RELEASING":
                 ep = i['media']['nextAiringEpisode']['episode'] - 1
             else:
                 #If anime HAS finished, make the last ep as the current ep
