@@ -2,10 +2,12 @@
 import logging as log
 import json
 import sys
+import argparse
 
 from Queries import Queries
 from update_config import update_list
 from searching import search, download
+
 
 log.basicConfig(filename="logs/log.log",
                 format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -25,20 +27,20 @@ log.info("Scheduled Run BEGIN")
 
 # config = update_list(
 #     config=config, query=Queries.current_watching, userID=config["userID"], )
-config = update_list(
+data = update_list(
     config=config, query=Queries.current_watching_anime, userID=config["userID"], )
 
 
 try:
-    raw = open("config.json", "w+")
+    raw = open("data.json", "w+")
 except FileNotFoundError:
-    log.critical("FAILED to open config.json to write data")
+    log.critical("FAILED to open data.json to write data")
     sys.quit()
-raw.write(json.dumps(config))
+raw.write(json.dumps(data))
 raw.close()
 
 log.info("List Update Successfull")
-res = search(config)
+res = search(config, data)
 log.info("Search Successfull")
-download(config, res)
+download(config,data, res)
 log.info("Scheduled Run END")

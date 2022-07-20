@@ -45,7 +45,8 @@ def process_data(raw: dict):
         return {}
     for i in l:
         #Filter: Season and year; match only anime in the current season
-        if i['media']['season'] == SEASON and i['media']['seasonYear'] == YEAR:
+        #if i['media']['season'] == SEASON and i['media']['seasonYear'] == YEAR:
+        if i['media']['seasonYear'] == YEAR:
             name = i["media"]['title']["romaji"]
             name = re.sub('[^a-zA-Z\s]', ' ', name)
             name = name.replace("  ", " ")
@@ -62,6 +63,7 @@ def process_data(raw: dict):
 
 
 def update_list(config:dict, query: str,userID: int) -> dict:
+    data = {}
     variables = {'userId': userID}
     try:
         res = requests.post(base_url,
@@ -79,9 +81,9 @@ def update_list(config:dict, query: str,userID: int) -> dict:
     except requests.ConnectionError:
         time.sleep(300)
     ids, processed = process_data(json.loads(res.content))
-    config['ids'] = ids
-    config["names"] = processed
-    return config
+    data['ids'] = ids
+    data["names"] = processed
+    return data
 
 
 if __name__ == '__main__':

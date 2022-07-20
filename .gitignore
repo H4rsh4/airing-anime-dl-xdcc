@@ -4,6 +4,7 @@ py
 tmp
 .vscode
 config.json
+data.json
 r.txt
 *.log
 *.sh

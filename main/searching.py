@@ -52,7 +52,7 @@ def check_file(config: dict, folder_name: str, filename: str, filesize: int) -> 
     return False
 
 
-def download(config, searches):
+def download(config, data, searches):
     '''
     Searches for each file in the folder; if it doesnt exist->download
     '''
@@ -69,13 +69,13 @@ def download(config, searches):
                 continue
 
 
-def search(config: dict) -> list:
+def search(config: dict, data:dict) -> list:
     '''
     Searches for latest episode of each show
     only NIBL is searched
     may implement animk as well in future
     '''
-    user_list = config["names"].keys()
+    user_list = data["names"].keys()
     search_results = {}
 
     def change_props(xdccOBJ: XDCCPack, show):
@@ -83,19 +83,24 @@ def search(config: dict) -> list:
         return xdccOBJ
 
     for show in user_list:
-        ep = str(config["names"][show]).zfill(2)
+        break_cond= False
+        retry = config["retry-limit"]
+        ep = str(data["names"][show]).zfill(2)
         current_show_search_results = SearchEngines.NIBL.value.search(
             show+' '+ep+' '+str(config["resolution"]))
         if not current_show_search_results:
+            retry_counter = 1
             while(True):
                 logger.info(
-                    f"Couldn't find latest ep of {show}\nWill Retry in 30mins")
-                time.sleep(30*60)  # 30mins
-                logger.info(f"ReSearching {show}")
-                current_show_search_results = SearchEngines.NIBL.value.search(
-                    show+' '+ep+' '+str(config["resolution"]))
-                if current_show_search_results:
+                    f"Couldn't find latest ep of {show} ; Next Retry Attempt: {retry_counter}")
+                time.sleep(30)  # 30mins
+                logger.info(f"ReSearching {show} ; RetryLimit : {retry}")
+                current_show_search_results = SearchEngines.NIBL.value.search(show+' '+ep+' '+str(config["resolution"]))
+                if current_show_search_results or (retry_counter > config["retry-limit"]):
+                    break_cond = True
                     break
+                retry_counter+=1
+        if break_cond : continue
 
         # else:
         for pack in current_show_search_results:
